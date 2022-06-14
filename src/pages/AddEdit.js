@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./AddEdit.css";
-import fireDb from 'firebase/compat/app';
+import {db} from './firebase';
+import {collection, getDocs} from "firebase/firestore";
+
 import { toast } from "react-toastify";
 
 const initialState = {
+  EmpNo:"",
   FirstName: "",
   LastName: "",
   Address:"",
@@ -15,31 +18,31 @@ const initialState = {
 
 const AddEdit = () => {
   const [state, setState] = useState(initialState);
-  const [data, setData] = useState({});
+  const [employees, setEmployees] = useState({});
+  const employeesCollectionRef = collection(db, "employees");
 
-  const { FirstName , LastName , Address , PhoneNo , AadharNo, PanNo } = state;
+  const { EmpNo, FirstName , LastName , Address , PhoneNo , AadharNo, PanNo } = state;
 
   const navigate = useNavigate();
 
   const { id } = useParams();
 
-  useEffect(() => {
-    fireDb.child("Employees").on("value", (snapshot) => {
-      if (snapshot.val() !== null) {
-        setData({ ...snapshot.val() });
-      } else {
-        setData({});
-      }
-    });
+  
 
-    return () => {
-      setData({});
-    };
-  }, [id]);
+  useEffect(() => {
+    const getEmployees = async () => {
+    const data = await getDocs(employeesCollectionRef);
+    setEmployees(data.docs.map((doc) => ({...doc.data(), id:doc.id})));
+    } 
+  
+    getEmployees();
+  },);
+
+
 
   useEffect(() => {
     if (id) {
-      setState({ ...data[id] });
+      setState({ ...employees[id] });
     } else {
       setState({ ...initialState });
     }
@@ -47,7 +50,7 @@ const AddEdit = () => {
     return () => {
       setState({ ...initialState });
     };
-  }, [id, data]);
+  }, [id, employees]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -56,11 +59,11 @@ const AddEdit = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!FirstName || !LastName || !Address || !PhoneNo || !AadharNo || !PanNo) {
+    if (!EmpNo || !FirstName || !LastName || !Address || !PhoneNo || !AadharNo || !PanNo) {
       toast.error("Please provide value in each input field");
     } else {
       if (!id) {
-        fireDb.child("Employees").push(state, (err) => {
+        db.child("Employees").push(state, (err) => {
           if (err) {
             toast.error(err);
           } else {
@@ -68,7 +71,7 @@ const AddEdit = () => {
           }
         });
       } else {
-        fireDb.child(`Employees/${id}`).set(state, (err) => {
+        db.child(`Employees/${id}`).set(state, (err) => {
           if (err) {
             toast.error(err);
           } else {
@@ -91,15 +94,24 @@ const AddEdit = () => {
         }}
         onSubmit={handleSubmit}
       >
-        <label htmlFor="name">FirstName</label>
-        <input
-          type="text"
-          id="name"
-          name="Firstname"
-          placeHolder="Your Name..."
-          value={FirstName || ""}
-          onChange={handleInputChange}
-        />
+      <label htmlFor="name">EmpNo</label>
+      <input
+        type="number"
+        id="number"
+        name="EmpNo"
+        placeHolder="Your /EmpNo..."
+        value={EmpNo || ""}
+        onChange={handleInputChange}
+      />
+      <label htmlFor="name">FirstName</label>
+      <input
+        type="text"
+        id="name"
+        name="Firstname"
+        placeHolder="Your FirstName..."
+        value={FirstName || ""}
+        onChange={handleInputChange}
+      />
         <label htmlFor="name">LastName</label>
         <input
           type="text"
@@ -109,13 +121,22 @@ const AddEdit = () => {
           value={LastName || ""}
           onChange={handleInputChange}
         />
-        <label htmlFor="PhoneNo">PhoneNo</label>
+        <label htmlFor="Address">Address</label>
+        <input
+          type="text"
+          id="name"
+          name="Address"
+          placeHolder="Your Address. ..."
+          value={Address || ""}
+          onChange={handleInputChange}
+        />
+        <label htmlFor="name">PhoneNo</label>
         <input
           type="number"
-          id="PhoneNo"
+          id="number"
           name="PhoneNo"
           placeHolder="Your PhoneNo. ..."
-          value={{PhoneNo} || ""}
+          value={PhoneNo || ""}
           onChange={handleInputChange}
         />
         <label htmlFor="name">AadharNo</label>
