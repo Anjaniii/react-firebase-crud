@@ -5,7 +5,6 @@ import "./Header.css";
 const Header = () => {
   const [activeTab, setActiveTab] = useState("Home");
   const location = useLocation();
-  const [search, setSearch] = useState("");
 
   const navigate = useNavigate();
 
@@ -17,24 +16,13 @@ const Header = () => {
     } 
   }, [location]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    navigate.push(`/search?name=${search}`);
-    setSearch("");
-  };
+  
   return (
     <div className="header">
       <p className="logo">Employee data App</p>
       <div className="header-right">
-        <form onSubmit={handleSubmit} style={{ display: "inline" }}>
-          <input
-            type="text"
-            className="inputField"
-            placeholder="Search Employee ..."
-            onChange={(e) => setSearch(e.target.value)}
-            value={search}
-          />
-        </form>
+        
+          
         <Link to="/">
           <p
             className={`${activeTab === "Home" ? "active" : ""}`}
