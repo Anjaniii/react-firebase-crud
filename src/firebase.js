@@ -1,9 +1,11 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "@firebase/firestore";
 
+
 const firebaseConfig = {
   apiKey: "AIzaSyAkpRdXzVFWXZvC2oAtCEdXV-bOpLtetrw",
   authDomain: "employee-data-d9331.firebaseapp.com",
+  databaseURL: "https://employee-data-d9331-default-rtdb.firebaseio.com",
   projectId: "employee-data-d9331",
   storageBucket: "employee-data-d9331.appspot.com",
   messagingSenderId: "672542227662",
